@@ -1,3 +1,5 @@
+import os
+import replicate
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,11 +17,26 @@ app.add_middleware(
 def home():
     return {"message": "AI Video Generator Backend Running 🚀"}
 
+
 @app.get("/generate")
 def generate_video(prompt: str, duration: int):
+
+    replicate_token = os.environ.get("REPLICATE_API_TOKEN")
+
+    if not replicate_token:
+        return {"error": "Replicate API token not found"}
+
+    client = replicate.Client(api_token=replicate_token)
+
+    output = client.run(
+        "cjwbw/videocrafter",
+        input={
+            "prompt": prompt,
+            "duration": duration
+        }
+    )
+
     return {
-        "status": "processing",
-        "prompt": prompt,
-        "duration": duration,
-        "message": "Video generation started"
+        "status": "completed",
+        "video_url": output
     }
