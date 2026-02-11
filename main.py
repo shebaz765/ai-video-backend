@@ -1,7 +1,9 @@
 import os
-import replicate
+import requests
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from moviepy.editor import ImageClip
 
 app = FastAPI()
 
@@ -15,26 +17,25 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message": "AI Video Generator Backend Running 🚀"}
+    return {"message": "AI Image to Video Generator Running 🚀"}
+
 
 @app.get("/generate")
 def generate_video(prompt: str):
 
-    replicate_token = os.environ.get("REPLICATE_API_TOKEN")
+    # Free AI image generation (Pollinations)
+    image_url = f"https://image.pollinations.ai/prompt/{prompt}"
 
-    if not replicate_token:
-        return {"error": "Replicate API token not found"}
+    image_path = "image.jpg"
+    video_path = "output.mp4"
 
-    client = replicate.Client(api_token=replicate_token)
+    # Download image
+    response = requests.get(image_url)
+    with open(image_path, "wb") as f:
+        f.write(response.content)
 
-    output = client.run(
-        "cjwbw/videocrafter",
-        input={
-            "prompt": prompt
-        }
-    )
+    # Convert image to 5-second video
+    clip = ImageClip(image_path).set_duration(5)
+    clip.write_videofile(video_path, fps=24)
 
-    return {
-        "status": "completed",
-        "video_url": output
-    }
+    return FileResponse(video_path, media_type="video/mp4", filename="ai_video.mp4")
