@@ -1,9 +1,7 @@
-import os
 import requests
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from moviepy.editor import ImageClip
+from fastapi.responses import Response
 
 app = FastAPI()
 
@@ -17,25 +15,16 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message": "AI Image to Video Generator Running 🚀"}
-
+    return {"message": "AI Image Generator Running 🚀"}
 
 @app.get("/generate")
-def generate_video(prompt: str):
+def generate_image(prompt: str):
 
-    # Free AI image generation (Pollinations)
     image_url = f"https://image.pollinations.ai/prompt/{prompt}"
 
-    image_path = "image.jpg"
-    video_path = "output.mp4"
-
-    # Download image
     response = requests.get(image_url)
-    with open(image_path, "wb") as f:
-        f.write(response.content)
 
-    # Convert image to 5-second video
-    clip = ImageClip(image_path).set_duration(5)
-    clip.write_videofile(video_path, fps=24)
-
-    return FileResponse(video_path, media_type="video/mp4", filename="ai_video.mp4")
+    return Response(
+        content=response.content,
+        media_type="image/jpeg"
+    )
