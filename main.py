@@ -28,7 +28,7 @@ def generate_video(prompt: str):
     client = replicate.Client(api_token=replicate_token)
 
     output = client.run(
-        "stability-ai/stable-video-diffusion",
+        "cjwbw/videocrafter",
         input={
             "prompt": prompt
         }
