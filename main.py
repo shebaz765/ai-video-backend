@@ -1,25 +1,5 @@
-import os
-import replicate
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.get("/")
-def home():
-    return {"message": "AI Video Generator Backend Running 🚀"}
-
-
 @app.get("/generate")
-def generate_video(prompt: str, duration: int):
+def generate_video(prompt: str):
 
     replicate_token = os.environ.get("REPLICATE_API_TOKEN")
 
@@ -29,10 +9,9 @@ def generate_video(prompt: str, duration: int):
     client = replicate.Client(api_token=replicate_token)
 
     output = client.run(
-        "cjwbw/videocrafter",
+        "stability-ai/stable-video-diffusion",
         input={
-            "prompt": prompt,
-            "duration": duration
+            "prompt": prompt
         }
     )
 
