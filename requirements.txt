@@ -1,3 +1,6 @@
 fastapi
 uvicorn
-replicate
+requests
+moviepy
+imageio
+imageio-ffmpeg
